@@ -20,8 +20,13 @@ module Draper
     def initialize(input, options = {})
       input.to_a if input.respond_to?(:to_a) # forces evaluation of a lazy query from AR
       self.class.model_class = input.class if model_class.nil?
-      @model = input.kind_of?(Draper::Base) ? input.model : input
-      self.options = options
+      if input.kind_of?(Draper::Base)
+        @model       = input.model
+        self.options = options.reverse_merge(input.options)
+      else
+        @model       = input
+        self.options = options
+      end
       self.extend Draper::ActiveModelSupport::Proxies
     end
 
